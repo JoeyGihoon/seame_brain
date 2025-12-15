@@ -48,10 +48,11 @@ import psutil
 try:
     available_cores = list(range(psutil.cpu_count()))
     psutil.Process(os.getpid()).cpu_affinity(available_cores)
-    print("Sucess to use psutil")
+    print(available_cores)
+    print("Sucess to use psutil") 
 except:
     print("Fail to use psutil ")
-    
+
 # 모듈 검색 경로 추가 , 공용 메세지 큐 설정--> 모든 프로세스 여기서 통신 
 sys.path.append(".")
 from multiprocessing import Queue, Event
