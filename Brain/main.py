@@ -217,6 +217,7 @@ try:
     # wait for all events to be set
     for event in allEvents:
         event.wait()
+        print("Process is here")
 
     logging.info("All processes signaled ready; entering main control loop.")
 
