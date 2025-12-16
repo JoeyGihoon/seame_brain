@@ -110,6 +110,7 @@ export class HardwareDataComponent {
       if (now - this.lastCpuUpdateMs > 5000) {
         this.cpuTemp = 0;
         this.cpuUsage = 0;
+        // 5초이상 업데이트 없으면 0으로 표시 
       }
       if (now - this.lastMemoryUpdateMs > 5000) {
         this.memoryUsage = 0;
