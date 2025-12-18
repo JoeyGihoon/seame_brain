@@ -69,3 +69,7 @@ Brain/src/dashboard/frontend/.angular/
 
 # Temp logs
 Brain/temp/*.log
+
+# mac
+.DS_Store
+**/.DS_Store

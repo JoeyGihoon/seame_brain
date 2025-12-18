@@ -122,6 +122,7 @@ class RosCameraThread(ThreadWithStop):
             from rclpy.executors import SingleThreadedExecutor
             from rclpy.node import Node
             from sensor_msgs.msg import CompressedImage
+            from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
         except ImportError as exc:
             if not self._ros_import_error:
                 print(f"\033[1;97m[ RosCamera ] :\033[0m \033[1;91mERROR\033[0m - ROS2 imports failed: {exc}")
@@ -131,6 +132,13 @@ class RosCameraThread(ThreadWithStop):
         try:
             if not rclpy.ok():
                 rclpy.init(args=None)
+
+            qos_profile_sensor_data = QoSProfile(
+                reliability=ReliabilityPolicy.BEST_EFFORT,
+                durability=DurabilityPolicy.VOLATILE,
+                history=HistoryPolicy.KEEP_LAST,
+                depth=5,
+            )
 
             outer_self = self
             serial_sender = self.serialCameraSender
@@ -154,8 +162,8 @@ class RosCameraThread(ThreadWithStop):
                         if now_ts - outer_self._last_send_ts < outer_self.min_frame_interval:
                             return
 
-                        # msg.data: 이미 JPEG/PNG 바이트임 → base64만 하면 됨
-                        payload = base64.b64encode(bytes(msg.data)).decode("utf-8")
+                        # msg.data: JPEG/PNG 바이트 → 그대로 전달 (base64 불필요)
+                        payload = bytes(msg.data)
 
                         serial_sender.send(payload)
 

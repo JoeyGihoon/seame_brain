@@ -50,6 +50,7 @@ ENABLE_CAMERA = True
 ENABLE_SEMAPHORES = False
 ENABLE_TRAFFIC_COM = False
 ENABLE_SERIAL_HANDLER = True
+ENABLE_CMDVELBRIDGE = True
 
 # Pin to CPU cores 0–3
 # 프로세르를 모든 cpu 코어에 고정
@@ -76,8 +77,6 @@ from src.gateway.processGateway import processGateway
 from src.dashboard.processDashboard import processDashboard
 
 
-from src.hardware.camera.processRosCamera import processRosCamera
-
 from src.hardware.serialhandler.processSerialHandler import processSerialHandler
 from src.data.Semaphores.processSemaphores import processSemaphores
 from src.data.TrafficCommunication.processTrafficCommunication import processTrafficCommunication
@@ -87,7 +86,8 @@ from src.statemachine.stateMachine import StateMachine
 from src.statemachine.systemMode import SystemMode
 
 # ------ New component imports starts here ------#
-
+from src.hardware.camera.processRosCamera import processRosCamera
+from src.bridge.processCmdbrdige import create_cmd_vel_bridge_process
 
 # ------ New component imports ends here ------#
 
@@ -133,6 +133,7 @@ queueList = {
     "Warning": Queue(),
     "General": Queue(),
     "Config": Queue(),
+    "Image": Queue(),
 }
 logging = logging.getLogger()
 
@@ -188,6 +189,15 @@ if ENABLE_SERIAL_HANDLER:
 else:
     processSerialHandler = None
 
+# Initializing /cmd_vel bridge
+cmdvel_bridge_ready = Event()
+if ENABLE_CMDVELBRIDGE:
+    processCmdVelBridge = create_cmd_vel_bridge_process(queueList, ready_event=cmdvel_bridge_ready)
+else:
+    processCmdVelBridge = None
+    cmdvel_bridge_ready.set()
+    
+
 # Adding all processes to the list
 for proc, ready_event in [
     (processCamera, camera_ready),
@@ -195,6 +205,7 @@ for proc, ready_event in [
     (processTrafficCom, traffic_com_ready),
     (processSerialHandler, serial_handler_ready),
     (processDashboard, dashboard_ready),
+    (processCmdVelBridge, cmdvel_bridge_ready),
 ]:
     if proc is not None:
         allProcesses.append(proc)
