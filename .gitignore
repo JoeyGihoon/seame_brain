@@ -63,3 +63,6 @@ src/dashboard/frontend/.angular/**
 # Runtime logs
 temp/*.log
 temp/**/*.log
+
+# Angular cache
+Brain/src/dashboard/frontend/.angular/
