@@ -39,6 +39,7 @@ from src.utils.messages.messageHandlerSubscriber import messageHandlerSubscriber
 from src.utils.messages.allMessages import serialCamera, StateChange
 from src.statemachine.systemMode import SystemMode
 
+from rclpy.qos import qos_profile_sensor_data
 
 class RosCameraThread(ThreadWithStop):
     """ROS2 RealSense 이미지 구독 스레드.
@@ -56,7 +57,7 @@ class RosCameraThread(ThreadWithStop):
         topic_name: str = "/camera/camera/color/image_raw/compressed",
         realsense_cmd: Optional[str] = None,
         keepalive_sec: float = 0.5,
-        min_frame_interval: float = 0.3,  # fps cap to prevent backlog
+        min_frame_interval: float = 0.1,  #최소 10 fps
     ):
         super(RosCameraThread, self).__init__(pause=0.01)
         self.queuesList = queuesList
@@ -148,10 +149,10 @@ class RosCameraThread(ThreadWithStop):
             args = shlex.split(self.realsense_cmd)
             self.realsense_proc = subprocess.Popen(
                 args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-            )
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                )
+
             print(f"\033[1;97m[ RosCamera ] :\033[0m \033[1;92mINFO\033[0m - Started RealSense node: {self.realsense_cmd}")
         except FileNotFoundError:
             print(f"\033[1;97m[ RosCamera ] :\033[0m \033[1;91mERROR\033[0m - Command not found: {self.realsense_cmd}")
@@ -186,7 +187,7 @@ class RosCameraThread(ThreadWithStop):
                 def __init__(self, topic: str):
                     super().__init__("ros_camera_bridge")
                     self.subscription = self.create_subscription(
-                        CompressedImage, topic, self.listener_callback, 10
+                        CompressedImage, topic, self.listener_callback, qos_profile_sensor_data
                     )
 
                 def listener_callback(self, msg):
