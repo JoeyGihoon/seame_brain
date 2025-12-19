@@ -143,7 +143,7 @@ class SystemMode(Enum):
         "mode": "stop",
         "camera": {
             "process": {
-                "enabled": False,
+                "enabled": True,
             },
             "thread": {
                 "resolution": "240p",
