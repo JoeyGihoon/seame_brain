@@ -39,7 +39,8 @@ class serialCamera(Enum):
     Queue = "Image"
     Owner = "threadCamera"
     msgID = 2
-    msgType = "str"
+    # Raw JPEG/PNG bytes sent to dashboard (previously base64 string)
+    msgType = "bytes"
 
 class Recording(Enum):
     Queue = "General"

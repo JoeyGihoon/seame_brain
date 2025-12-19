@@ -53,15 +53,25 @@ export class LiveCameraComponent {
 
     this.cameraSubscription = this.webSocketService.receiveCamera().subscribe(
       (message) => {
-        // 바이너리(ArrayBuffer) 또는 base64 문자열 모두 처리
-        if (message instanceof ArrayBuffer) {
-          const blob = new Blob([message], { type: 'image/jpeg' });
+        // 바이너리(ArrayBuffer/Blob/Buffer) 또는 base64 문자열 모두 처리
+        const payload = (message as any)?.value ?? message;
+
+        if (payload instanceof Blob) {
+          this.image = URL.createObjectURL(payload);
+        } else if (payload instanceof ArrayBuffer) {
+          const blob = new Blob([payload], { type: 'image/jpeg' });
           this.image = URL.createObjectURL(blob);
-        } else if (message && message.type === 'Buffer' && Array.isArray((message as any).data)) {
-          const blob = new Blob([new Uint8Array((message as any).data)], { type: 'image/jpeg' });
+        } else if (payload && (payload as any).type === 'Buffer' && Array.isArray((payload as any).data)) {
+          const blob = new Blob([new Uint8Array((payload as any).data)], { type: 'image/jpeg' });
           this.image = URL.createObjectURL(blob);
-        } else if ((message as any)?.value) {
-          this.image = `data:image/jpeg;base64,${(message as any).value}`;
+        } else if (typeof payload === 'string') {
+          // 이미 data URL이면 그대로, 아니면 base64로 가정
+          this.image = payload.startsWith('data:image')
+            ? payload
+            : `data:image/jpeg;base64,${payload}`;
+        } else {
+          // 알 수 없는 타입이면 블랙 이미지로 리셋
+          this.image = this.createBlackImage();
         }
         this.loading = false;
         // Reset the loading timeout on each new image

@@ -20,7 +20,7 @@ class RosCameraThread(ThreadWithStop):
 
     - realsense2_camera 노드는 외부에서 따로 실행한다고 가정
       예) ros2 run realsense2_camera realsense2_camera_node
-    - /.../compressed 토픽을 받아 base64로 인코딩하여 serialCamera로 전송
+    - /.../compressed 토픽을 받아 압축 바이너리 그대로 serialCamera로 전송
     - keepalive로 마지막 프레임을 주기적으로 재전송 (프론트 끊김 방지)
     """
 
@@ -31,7 +31,7 @@ class RosCameraThread(ThreadWithStop):
         debugging: bool = False,
         topic_name: str = "/camera/camera/color/image_raw/compressed",
         keepalive_sec: float = 0.5,
-        min_frame_interval: float = 0.1,  # 10fps (필요시 0.05=20fps)
+        min_frame_interval: float = 0.2,  # 10fps (필요시 0.05=20fps)
         init_retry_sec: float = 1.0,      # 토픽/ROS 준비 안됐을 때 재시도 간격
         node_name: str = "ros_camera_bridge",
     ):
