@@ -48,7 +48,7 @@ ENABLE_GATEWAY = True
 ENABLE_DASHBOARD = True
 ENABLE_CAMERA = True
 ENABLE_SEMAPHORES = False
-ENABLE_TRAFFIC_COM = False
+ENABLE_TRAFFIC_COM = False      ####################
 ENABLE_SERIAL_HANDLER = True
 ENABLE_CMDVELBRIDGE = True
 
@@ -243,7 +243,7 @@ try:
         message = stateChangeSubscriber.receive()
         if message is not None:
             modeDictSemaphore = SystemMode[message].value["semaphore"]["process"]
-            modeDictTrafficCom = SystemMode[message].value["traffic_com"]["process"]
+            modeDictTrafficCom = SystemMode[message].value["traffic_com"]["process"]    # True or False
 
             processSemaphore = manage_process_life(processSemaphores, processSemaphore, [queueList, logging, semaphore_ready, False], modeDictSemaphore["enabled"], allProcesses)
             processTrafficCom = manage_process_life(processTrafficCommunication, processTrafficCom, [queueList, logging, 3, traffic_com_ready, False], modeDictTrafficCom["enabled"], allProcesses)
